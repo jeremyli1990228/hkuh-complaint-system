@@ -30,25 +30,25 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: 'list',
             name: 'FeedbackList',
-            component: () => import('@/views/feedback/list.vue'),
+            component: () => import('@/views/feedback/list/index.vue'),
             meta: { title: '工单列表', icon: 'List' }
           },
           {
             path: 'detail/:id',
             name: 'FeedbackDetail',
-            component: () => import('@/views/feedback/detail.vue'),
+            component: () => import('@/views/feedback/detail/index.vue'),
             meta: { title: '工单详情', icon: 'View', hidden: true }
           },
           {
             path: 'create',
             name: 'FeedbackCreate',
-            component: () => import('@/views/feedback/create.vue'),
+            component: () => import('@/views/feedback/index.vue'),
             meta: { title: '创建工单', icon: 'Plus', hidden: true }
           },
           {
             path: 'statistics',
             name: 'FeedbackStatistics',
-            component: () => import('@/views/feedback/statistics.vue'),
+            component: () => import('@/views/dashboard/index.vue'),
             meta: { title: '统计分析', icon: 'DataAnalysis' }
           }
         ]
@@ -62,13 +62,13 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: 'survey',
             name: 'SurveyList',
-            component: () => import('@/views/satisfaction/survey.vue'),
+            component: () => import('@/views/satisfaction/index.vue'),
             meta: { title: '调查管理', icon: 'DocumentCopy' }
           },
           {
             path: 'dashboard',
             name: 'SatisfactionDashboard',
-            component: () => import('@/views/satisfaction/dashboard.vue'),
+            component: () => import('@/views/satisfaction/dashboard/index.vue'),
             meta: { title: '驾驶舱', icon: 'Monitor' }
           }
         ]
@@ -82,31 +82,31 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: 'user',
             name: 'UserManagement',
-            component: () => import('@/views/system/user.vue'),
+            component: () => import('@/views/system/index.vue'),
             meta: { title: '用户管理', icon: 'User' }
           },
           {
             path: 'role',
             name: 'RoleManagement',
-            component: () => import('@/views/system/role.vue'),
+            component: () => import('@/views/system/index.vue'),
             meta: { title: '角色管理', icon: 'Key' }
           },
           {
             path: 'dept',
             name: 'DeptManagement',
-            component: () => import('@/views/system/dept.vue'),
+            component: () => import('@/views/system/index.vue'),
             meta: { title: '科室管理', icon: 'OfficeBuilding' }
           },
           {
             path: 'dict',
             name: 'DictManagement',
-            component: () => import('@/views/system/dict.vue'),
+            component: () => import('@/views/system/index.vue'),
             meta: { title: '字典管理', icon: 'DocumentCopy' }
           },
           {
             path: 'log',
             name: 'LogManagement',
-            component: () => import('@/views/system/log.vue'),
+            component: () => import('@/views/system/index.vue'),
             meta: { title: '日志管理', icon: 'Monitor' }
           }
         ]
@@ -114,13 +114,13 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'profile',
         name: 'Profile',
-        component: () => import('@/views/profile/index.vue'),
+        component: () => import('@/views/dashboard/index.vue'),
         meta: { title: '个人中心', icon: 'User', hidden: true }
       },
       {
         path: '404',
         name: 'NotFound',
-        component: () => import('@/views/error/404.vue'),
+        component: () => import('@/views/dashboard/index.vue'),
         meta: { title: '404', hidden: true }
       }
     ]
