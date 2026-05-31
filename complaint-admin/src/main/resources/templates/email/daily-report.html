@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日投诉处理报告</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Microsoft YaHei', Arial, sans-serif; background-color: #f5f5f5;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
+        <tr>
+            <td align="center">
+                <table width="700" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%); padding: 24px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">
+                                📊 每日投诉处理报告
+                            </h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;" th:text="${reportDate}">
+                                2024年1月15日
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Summary Cards -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="25%" style="padding: 10px;">
+                                        <table width="100%" cellpadding="12" cellspacing="0" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 8px; text-align: center;">
+                                            <tr>
+                                                <td>
+                                                    <div style="font-size: 28px; font-weight: 700; color: #1565c0;" th:text="${reportData.newComplaints}">12</div>
+                                                    <div style="font-size: 12px; color: #666666; margin-top: 4px;">新增投诉</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="25%" style="padding: 10px;">
+                                        <table width="100%" cellpadding="12" cellspacing="0" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 8px; text-align: center;">
+                                            <tr>
+                                                <td>
+                                                    <div style="font-size: 28px; font-weight: 700; color: #2e7d32;" th:text="${reportData.processedComplaints}">8</div>
+                                                    <div style="font-size: 12px; color: #666666; margin-top: 4px;">已处理</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="25%" style="padding: 10px;">
+                                        <table width="100%" cellpadding="12" cellspacing="0" style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-radius: 8px; text-align: center;">
+                                            <tr>
+                                                <td>
+                                                    <div style="font-size: 28px; font-weight: 700; color: #f57c00;" th:text="${reportData.pendingComplaints}">4</div>
+                                                    <div style="font-size: 12px; color: #666666; margin-top: 4px;">待处理</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="25%" style="padding: 10px;">
+                                        <table width="100%" cellpadding="12" cellspacing="0" style="background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); border-radius: 8px; text-align: center;">
+                                            <tr>
+                                                <td>
+                                                    <div style="font-size: 28px; font-weight: 700; color: #d32f2f;" th:text="${reportData.overdueComplaints}">1</div>
+                                                    <div style="font-size: 12px; color: #666666; margin-top: 4px;">超期数</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- SLA Compliance -->
+                    <tr>
+                        <td style="padding: 0 30px 30px;">
+                            <table width="100%" cellpadding="16" cellspacing="0" style="background-color: #f5f5f5; border-radius: 8px;">
+                                <tr>
+                                    <td width="50%">
+                                        <div style="font-size: 14px; color: #666666;">SLA达标率</div>
+                                        <div style="font-size: 32px; font-weight: 700; color: #2e7d32; margin-top: 4px;" th:text="${reportData.slaComplianceRate}">92.5%</div>
+                                    </td>
+                                    <td width="50%">
+                                        <div style="font-size: 14px; color: #666666;">平均处理时长</div>
+                                        <div style="font-size: 32px; font-weight: 700; color: #1565c0; margin-top: 4px;" th:text="${reportData.averageProcessingTime}">4.2h</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Dept Statistics -->
+                    <tr th:if="${reportData.deptStats != null and not #lists.isEmpty(reportData.deptStats)}">
+                        <td style="padding: 0 30px 30px;">
+                            <h3 style="color: #333333; font-size: 16px; margin: 0 0 12px; border-left: 4px solid #1976d2; padding-left: 8px;">
+                                各科室处理情况
+                            </h3>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #eeeeee; border-radius: 8px; overflow: hidden;">
+                                <thead>
+                                    <tr style="background-color: #f5f5f5;">
+                                        <th style="padding: 12px; text-align: left; font-size: 13px; color: #666666;">科室</th>
+                                        <th style="padding: 12px; text-align: center; font-size: 13px; color: #666666;">新增</th>
+                                        <th style="padding: 12px; text-align: center; font-size: 13px; color: #666666;">已处理</th>
+                                        <th style="padding: 12px; text-align: center; font-size: 13px; color: #666666;">待处理</th>
+                                        <th style="padding: 12px; text-align: center; font-size: 13px; color: #666666;">SLA达标</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="dept : ${reportData.deptStats}" style="border-top: 1px solid #eeeeee;">
+                                        <td style="padding: 12px; font-size: 13px; color: #333333;" th:text="${dept.deptName}">内科</td>
+                                        <td style="padding: 12px; text-align: center; font-size: 13px; color: #666666;" th:text="${dept.newCount}">5</td>
+                                        <td style="padding: 12px; text-align: center; font-size: 13px; color: #666666;" th:text="${dept.processedCount}">4</td>
+                                        <td style="padding: 12px; text-align: center; font-size: 13px; color: #666666;" th:text="${dept.pendingCount}">1</td>
+                                        <td style="padding: 12px; text-align: center; font-size: 13px; color: #2e7d32;" th:text="${dept.slaRate}">95%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Button -->
+                    <tr>
+                        <td style="padding: 0 30px 30px; text-align: center;">
+                            <a th:href="${detailUrl}" style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%); color: #ffffff; text-decoration: none; border-radius: 25px; font-size: 14px; font-weight: 600;">
+                                查看完整报告 →
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #fafafa; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;">
+                            <p style="color: #999999; font-size: 12px; margin: 0;">
+                                本报告由港大医院投诉管理系统自动生成<br>
+                                如有疑问，请联系系统管理员
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

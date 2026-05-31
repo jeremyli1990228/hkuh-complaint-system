@@ -1,0 +1,49 @@
+name: Deploy H5 App to Netlify
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'complaint-h5/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: complaint-h5/package-lock.json
+
+      - name: Install dependencies
+        working-directory: complaint-h5
+        run: npm ci
+
+      - name: Build app
+        working-directory: complaint-h5
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_WECHAT_APP_ID: ${{ secrets.VITE_WECHAT_APP_ID }}
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: complaint-h5/dist
+          production-branch: main
+          production-deploy: true
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_H5_SITE_ID }}
+        timeout: 300

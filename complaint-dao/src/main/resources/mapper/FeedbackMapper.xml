@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkuh.complaint.mapper.FeedbackMapper">
+
+    <sql id="feedbackColumns">
+        f.ID,
+        f.FEEDBACK_NO,
+        f.TITLE,
+        f.CONTENT,
+        f.FEEDBACK_TYPE_ID,
+        f.COMPLAINANT_ID,
+        f.SOURCE,
+        f.PRIORITY,
+        f.STATUS,
+        f.DEPT_ID,
+        f.HANDLER_ID,
+        f.SLA_DEADLINE,
+        f.SLA_WARNING_TIME,
+        f.IS_ANONYMOUS,
+        f.CONTACT_PHONE,
+        f.CONTACT_EMAIL,
+        f.RATING,
+        f.RATING_COMMENT,
+        f.CREATE_BY,
+        f.CREATE_TIME,
+        f.UPDATE_BY,
+        f.UPDATE_TIME,
+        f.DEL_FLAG,
+        f.REMARK
+    </sql>
+
+    <resultMap id="BaseResultMap" type="com.hkuh.complaint.entity.Feedback">
+        <id column="ID" property="id"/>
+        <result column="FEEDBACK_NO" property="feedbackNo"/>
+        <result column="TITLE" property="title"/>
+        <result column="CONTENT" property="content"/>
+        <result column="FEEDBACK_TYPE_ID" property="feedbackTypeId"/>
+        <result column="COMPLAINANT_ID" property="complainantId"/>
+        <result column="SOURCE" property="source"/>
+        <result column="PRIORITY" property="priority"/>
+        <result column="STATUS" property="status"/>
+        <result column="DEPT_ID" property="deptId"/>
+        <result column="HANDLER_ID" property="handlerId"/>
+        <result column="SLA_DEADLINE" property="slaDeadline"/>
+        <result column="SLA_WARNING_TIME" property="slaWarningTime"/>
+        <result column="IS_ANONYMOUS" property="isAnonymous"/>
+        <result column="CONTACT_PHONE" property="contactPhone"/>
+        <result column="CONTACT_EMAIL" property="contactEmail"/>
+        <result column="RATING" property="rating"/>
+        <result column="RATING_COMMENT" property="ratingComment"/>
+        <result column="CREATE_BY" property="createBy"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="UPDATE_BY" property="updateBy"/>
+        <result column="UPDATE_TIME" property="updateTime"/>
+        <result column="DEL_FLAG" property="delFlag"/>
+        <result column="REMARK" property="remark"/>
+    </resultMap>
+
+    <resultMap id="FeedbackResultMap" type="com.hkuh.complaint.entity.Feedback" extends="BaseResultMap">
+        <association property="complainant" javaType="com.hkuh.complaint.entity.Complainant">
+            <id column="C_ID" property="id"/>
+            <result column="C_NAME" property="name"/>
+            <result column="C_ID_CARD" property="idCard"/>
+            <result column="C_PHONE" property="phone"/>
+            <result column="C_EMAIL" property="email"/>
+            <result column="C_GENDER" property="gender"/>
+            <result column="C_AGE" property="age"/>
+            <result column="C_ADDRESS" property="address"/>
+            <result column="C_OCCUPATION" property="occupation"/>
+            <result column="C_PATIENT_ID" property="patientId"/>
+        </association>
+        <association property="feedbackType" javaType="com.hkuh.complaint.entity.FeedbackType">
+            <id column="FT_ID" property="id"/>
+            <result column="FT_TYPE_NAME" property="typeName"/>
+            <result column="FT_TYPE_CODE" property="typeCode"/>
+            <result column="FT_SLA_DAYS" property="slaDays"/>
+            <result column="FT_SLA_HOURS" property="slaHours"/>
+            <result column="FT_DESCRIPTION" property="description"/>
+        </association>
+        <association property="dept" javaType="com.hkuh.complaint.entity.Dept">
+            <id column="D_ID" property="id"/>
+            <result column="D_DEPT_NAME" property="deptName"/>
+            <result column="D_DEPT_CODE" property="deptCode"/>
+        </association>
+        <association property="handler" javaType="com.hkuh.complaint.entity.User">
+            <id column="U_ID" property="id"/>
+            <result column="U_USERNAME" property="username"/>
+            <result column="U_REAL_NAME" property="realName"/>
+            <result column="U_PHONE" property="phone"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="FeedbackDetailResultMap" type="com.hkuh.complaint.entity.Feedback" extends="FeedbackResultMap">
+        <collection property="handleRecords" ofType="com.hkuh.complaint.entity.HandleRecord">
+            <id column="HR_ID" property="id"/>
+            <result column="HR_FEEDBACK_ID" property="feedbackId"/>
+            <result column="HR_HANDLER_ID" property="handlerId"/>
+            <result column="HR_ACTION" property="action"/>
+            <result column="HR_CONTENT" property="content"/>
+            <result column="HR_ATTACHMENT_IDS" property="attachmentIds"/>
+            <result column="HR_RESULT" property="result"/>
+            <result column="HR_IS_VISIBLE" property="isVisible"/>
+            <result column="HR_CREATE_TIME" property="createTime"/>
+        </collection>
+        <collection property="attachments" ofType="com.hkuh.complaint.entity.Attachment">
+            <id column="A_ID" property="id"/>
+            <result column="A_BUSINESS_ID" property="businessId"/>
+            <result column="A_BUSINESS_TYPE" property="businessType"/>
+            <result column="A_FILE_NAME" property="fileName"/>
+            <result column="A_FILE_PATH" property="filePath"/>
+            <result column="A_FILE_SIZE" property="fileSize"/>
+            <result column="A_FILE_TYPE" property="fileType"/>
+            <result column="A_CREATE_BY" property="createBy"/>
+            <result column="A_CREATE_TIME" property="createTime"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectById" resultMap="FeedbackResultMap">
+        SELECT
+            <include refid="feedbackColumns"/>,
+            c.ID AS C_ID, c.NAME AS C_NAME, c.ID_CARD AS C_ID_CARD, c.PHONE AS C_PHONE,
+            c.EMAIL AS C_EMAIL, c.GENDER AS C_GENDER, c.AGE AS C_AGE,
+            c.ADDRESS AS C_ADDRESS, c.OCCUPATION AS C_OCCUPATION, c.PATIENT_ID AS C_PATIENT_ID,
+            ft.ID AS FT_ID, ft.TYPE_NAME AS FT_TYPE_NAME, ft.TYPE_CODE AS FT_TYPE_CODE,
+            ft.SLA_DAYS AS FT_SLA_DAYS, ft.SLA_HOURS AS FT_SLA_HOURS, ft.DESCRIPTION AS FT_DESCRIPTION,
+            d.ID AS D_ID, d.DEPT_NAME AS D_DEPT_NAME, d.DEPT_CODE AS D_DEPT_CODE,
+            u.ID AS U_ID, u.USERNAME AS U_USERNAME, u.REAL_NAME AS U_REAL_NAME, u.PHONE AS U_PHONE
+        FROM T_FEEDBACK f
+        LEFT JOIN T_COMPLAINANT c ON f.COMPLAINANT_ID = c.ID AND c.DEL_FLAG = 0
+        LEFT JOIN T_FEEDBACK_TYPE ft ON f.FEEDBACK_TYPE_ID = ft.ID AND ft.DEL_FLAG = 0
+        LEFT JOIN SYS_DEPT d ON f.DEPT_ID = d.ID AND d.DEL_FLAG = 0
+        LEFT JOIN SYS_USER u ON f.HANDLER_ID = u.ID AND u.DEL_FLAG = 0
+        WHERE f.ID = #{id} AND f.DEL_FLAG = 0
+    </select>
+
+    <select id="selectByFeedbackNo" resultMap="FeedbackResultMap">
+        SELECT
+            <include refid="feedbackColumns"/>,
+            c.ID AS C_ID, c.NAME AS C_NAME, c.ID_CARD AS C_ID_CARD, c.PHONE AS C_PHONE,
+            c.EMAIL AS C_EMAIL, c.GENDER AS C_GENDER, c.AGE AS C_AGE,
+            c.ADDRESS AS C_ADDRESS, c.OCCUPATION AS C_OCCUPATION, c.PATIENT_ID AS C_PATIENT_ID,
+            ft.ID AS FT_ID, ft.TYPE_NAME AS FT_TYPE_NAME, ft.TYPE_CODE AS FT_TYPE_CODE,
+            ft.SLA_DAYS AS FT_SLA_DAYS, ft.SLA_HOURS AS FT_SLA_HOURS, ft.DESCRIPTION AS FT_DESCRIPTION,
+            d.ID AS D_ID, d.DEPT_NAME AS D_DEPT_NAME, d.DEPT_CODE AS D_DEPT_CODE,
+            u.ID AS U_ID, u.USERNAME AS U_USERNAME, u.REAL_NAME AS U_REAL_NAME, u.PHONE AS U_PHONE
+        FROM T_FEEDBACK f
+        LEFT JOIN T_COMPLAINANT c ON f.COMPLAINANT_ID = c.ID AND c.DEL_FLAG = 0
+        LEFT JOIN T_FEEDBACK_TYPE ft ON f.FEEDBACK_TYPE_ID = ft.ID AND ft.DEL_FLAG = 0
+        LEFT JOIN SYS_DEPT d ON f.DEPT_ID = d.ID AND d.DEL_FLAG = 0
+        LEFT JOIN SYS_USER u ON f.HANDLER_ID = u.ID AND u.DEL_FLAG = 0
+        WHERE f.FEEDBACK_NO = #{feedbackNo} AND f.DEL_FLAG = 0
+    </select>
+
+    <select id="selectList" resultMap="FeedbackResultMap">
+        SELECT * FROM (
+            SELECT temp.*, ROWNUM row_num FROM (
+                SELECT
+                    <include refid="feedbackColumns"/>,
+                    c.ID AS C_ID, c.NAME AS C_NAME, c.ID_CARD AS C_ID_CARD, c.PHONE AS C_PHONE,
+                    c.EMAIL AS C_EMAIL, c.GENDER AS C_GENDER, c.AGE AS C_AGE,
+                    c.ADDRESS AS C_ADDRESS, c.OCCUPATION AS C_OCCUPATION, c.PATIENT_ID AS C_PATIENT_ID,
+                    ft.ID AS FT_ID, ft.TYPE_NAME AS FT_TYPE_NAME, ft.TYPE_CODE AS FT_TYPE_CODE,
+                    ft.SLA_DAYS AS FT_SLA_DAYS, ft.SLA_HOURS AS FT_SLA_HOURS, ft.DESCRIPTION AS FT_DESCRIPTION,
+                    d.ID AS D_ID, d.DEPT_NAME AS D_DEPT_NAME, d.DEPT_CODE AS D_DEPT_CODE,
+                    u.ID AS U_ID, u.USERNAME AS U_USERNAME, u.REAL_NAME AS U_REAL_NAME, u.PHONE AS U_PHONE
+                FROM T_FEEDBACK f
+                LEFT JOIN T_COMPLAINANT c ON f.COMPLAINANT_ID = c.ID AND c.DEL_FLAG = 0
+                LEFT JOIN T_FEEDBACK_TYPE ft ON f.FEEDBACK_TYPE_ID = ft.ID AND ft.DEL_FLAG = 0
+                LEFT JOIN SYS_DEPT d ON f.DEPT_ID = d.ID AND d.DEL_FLAG = 0
+                LEFT JOIN SYS_USER u ON f.HANDLER_ID = u.ID AND u.DEL_FLAG = 0
+                WHERE f.DEL_FLAG = 0
+                <if test="feedbackNo != null and feedbackNo != ''">
+                    AND f.FEEDBACK_NO LIKE '%' || #{feedbackNo} || '%'
+                </if>
+                <if test="title != null and title != ''">
+                    AND f.TITLE LIKE '%' || #{title} || '%'
+                </if>
+                <if test="feedbackTypeId != null">
+                    AND f.FEEDBACK_TYPE_ID = #{feedbackTypeId}
+                </if>
+                <if test="source != null and source != ''">
+                    AND f.SOURCE = #{source}
+                </if>
+                <if test="priority != null and priority != ''">
+                    AND f.PRIORITY = #{priority}
+                </if>
+                <if test="status != null and status != ''">
+                    AND f.STATUS = #{status}
+                </if>
+                <if test="deptId != null">
+                    AND f.DEPT_ID = #{deptId}
+                </if>
+                <if test="handlerId != null">
+                    AND f.HANDLER_ID = #{handlerId}
+                </if>
+                <if test="startDate != null">
+                    AND f.CREATE_TIME &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                </if>
+                <if test="endDate != null">
+                    AND f.CREATE_TIME &lt;= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+                </if>
+                <if test="keyword != null and keyword != ''">
+                    AND (f.TITLE LIKE '%' || #{keyword} || '%' OR f.CONTENT LIKE '%' || #{keyword} || '%')
+                </if>
+                ORDER BY f.CREATE_TIME DESC
+            ) temp WHERE ROWNUM &lt;= #{endRow}
+        ) WHERE row_num &gt; #{startRow}
+    </select>
+
+    <select id="selectDetailById" resultMap="FeedbackDetailResultMap">
+        SELECT
+            <include refid="feedbackColumns"/>,
+            c.ID AS C_ID, c.NAME AS C_NAME, c.ID_CARD AS C_ID_CARD, c.PHONE AS C_PHONE,
+            c.EMAIL AS C_EMAIL, c.GENDER AS C_GENDER, c.AGE AS C_AGE,
+            c.ADDRESS AS C_ADDRESS, c.OCCUPATION AS C_OCCUPATION, c.PATIENT_ID AS C_PATIENT_ID,
+            ft.ID AS FT_ID, ft.TYPE_NAME AS FT_TYPE_NAME, ft.TYPE_CODE AS FT_TYPE_CODE,
+            ft.SLA_DAYS AS FT_SLA_DAYS, ft.SLA_HOURS AS FT_SLA_HOURS, ft.DESCRIPTION AS FT_DESCRIPTION,
+            d.ID AS D_ID, d.DEPT_NAME AS D_DEPT_NAME, d.DEPT_CODE AS D_DEPT_CODE,
+            u.ID AS U_ID, u.USERNAME AS U_USERNAME, u.REAL_NAME AS U_REAL_NAME, u.PHONE AS U_PHONE,
+            hr.ID AS HR_ID, hr.FEEDBACK_ID AS HR_FEEDBACK_ID, hr.HANDLER_ID AS HR_HANDLER_ID,
+            hr.ACTION AS HR_ACTION, hr.CONTENT AS HR_CONTENT, hr.ATTACHMENT_IDS AS HR_ATTACHMENT_IDS,
+            hr.RESULT AS HR_RESULT, hr.IS_VISIBLE AS HR_IS_VISIBLE, hr.CREATE_TIME AS HR_CREATE_TIME,
+            a.ID AS A_ID, a.BUSINESS_ID AS A_BUSINESS_ID, a.BUSINESS_TYPE AS A_BUSINESS_TYPE,
+            a.FILE_NAME AS A_FILE_NAME, a.FILE_PATH AS A_FILE_PATH, a.FILE_SIZE AS A_FILE_SIZE,
+            a.FILE_TYPE AS A_FILE_TYPE, a.CREATE_BY AS A_CREATE_BY, a.CREATE_TIME AS A_CREATE_TIME
+        FROM T_FEEDBACK f
+        LEFT JOIN T_COMPLAINANT c ON f.COMPLAINANT_ID = c.ID AND c.DEL_FLAG = 0
+        LEFT JOIN T_FEEDBACK_TYPE ft ON f.FEEDBACK_TYPE_ID = ft.ID AND ft.DEL_FLAG = 0
+        LEFT JOIN SYS_DEPT d ON f.DEPT_ID = d.ID AND d.DEL_FLAG = 0
+        LEFT JOIN SYS_USER u ON f.HANDLER_ID = u.ID AND u.DEL_FLAG = 0
+        LEFT JOIN T_HANDLE_RECORD hr ON f.ID = hr.FEEDBACK_ID
+        LEFT JOIN T_ATTACHMENT a ON f.ID = a.BUSINESS_ID AND a.BUSINESS_TYPE = 'FEEDBACK' AND a.DEL_FLAG = 0
+        WHERE f.ID = #{id} AND f.DEL_FLAG = 0
+        ORDER BY hr.CREATE_TIME ASC
+    </select>
+
+    <select id="countByStatus" resultType="java.util.Map">
+        SELECT STATUS AS status, COUNT(*) AS count
+        FROM T_FEEDBACK
+        WHERE DEL_FLAG = 0
+        <if test="startDate != null">
+            AND CREATE_TIME &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null">
+            AND CREATE_TIME &lt;= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+        </if>
+        GROUP BY STATUS
+    </select>
+
+    <select id="countByType" resultType="java.util.Map">
+        SELECT ft.TYPE_NAME AS typeName, COUNT(*) AS count
+        FROM T_FEEDBACK f
+        LEFT JOIN T_FEEDBACK_TYPE ft ON f.FEEDBACK_TYPE_ID = ft.ID AND ft.DEL_FLAG = 0
+        WHERE f.DEL_FLAG = 0
+        <if test="startDate != null">
+            AND f.CREATE_TIME &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null">
+            AND f.CREATE_TIME &lt;= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+        </if>
+        GROUP BY ft.TYPE_NAME
+    </select>
+
+    <select id="countBySource" resultType="java.util.Map">
+        SELECT SOURCE AS source, COUNT(*) AS count
+        FROM T_FEEDBACK
+        WHERE DEL_FLAG = 0
+        <if test="startDate != null">
+            AND CREATE_TIME &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null">
+            AND CREATE_TIME &lt;= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+        </if>
+        GROUP BY SOURCE
+    </select>
+
+    <insert id="insert" parameterType="com.hkuh.complaint.entity.Feedback">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT SEQ_T_FEEDBACK.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO T_FEEDBACK (
+            ID, FEEDBACK_NO, TITLE, CONTENT, FEEDBACK_TYPE_ID, COMPLAINANT_ID,
+            SOURCE, PRIORITY, STATUS, DEPT_ID, HANDLER_ID,
+            SLA_DEADLINE, SLA_WARNING_TIME, IS_ANONYMOUS, CONTACT_PHONE, CONTACT_EMAIL,
+            RATING, RATING_COMMENT, CREATE_BY, CREATE_TIME, DEL_FLAG, REMARK
+        ) VALUES (
+            #{id}, #{feedbackNo}, #{title}, #{content}, #{feedbackTypeId}, #{complainantId},
+            #{source}, #{priority}, #{status}, #{deptId}, #{handlerId},
+            #{slaDeadline}, #{slaWarningTime}, #{isAnonymous}, #{contactPhone}, #{contactEmail},
+            #{rating}, #{ratingComment}, #{createBy},
+            NVL(#{createTime}, SYSDATE), NVL(#{delFlag}, 0), #{remark}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.hkuh.complaint.entity.Feedback">
+        UPDATE T_FEEDBACK
+        <set>
+            <if test="title != null">TITLE = #{title},</if>
+            <if test="content != null">CONTENT = #{content},</if>
+            <if test="feedbackTypeId != null">FEEDBACK_TYPE_ID = #{feedbackTypeId},</if>
+            <if test="complainantId != null">COMPLAINANT_ID = #{complainantId},</if>
+            <if test="source != null">SOURCE = #{source},</if>
+            <if test="priority != null">PRIORITY = #{priority},</if>
+            <if test="status != null">STATUS = #{status},</if>
+            <if test="deptId != null">DEPT_ID = #{deptId},</if>
+            <if test="handlerId != null">HANDLER_ID = #{handlerId},</if>
+            <if test="slaDeadline != null">SLA_DEADLINE = #{slaDeadline},</if>
+            <if test="slaWarningTime != null">SLA_WARNING_TIME = #{slaWarningTime},</if>
+            <if test="isAnonymous != null">IS_ANONYMOUS = #{isAnonymous},</if>
+            <if test="contactPhone != null">CONTACT_PHONE = #{contactPhone},</if>
+            <if test="contactEmail != null">CONTACT_EMAIL = #{contactEmail},</if>
+            <if test="rating != null">RATING = #{rating},</if>
+            <if test="ratingComment != null">RATING_COMMENT = #{ratingComment},</if>
+            <if test="updateBy != null">UPDATE_BY = #{updateBy},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+            <if test="delFlag != null">DEL_FLAG = #{delFlag},</if>
+            <if test="remark != null">REMARK = #{remark},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE T_FEEDBACK
+        SET STATUS = #{status},
+            UPDATE_BY = #{updateBy},
+            UPDATE_TIME = SYSDATE
+        WHERE ID = #{id}
+    </update>
+
+    <select id="selectSlaWarningList" resultMap="FeedbackResultMap">
+        SELECT
+            <include refid="feedbackColumns"/>,
+            c.ID AS C_ID, c.NAME AS C_NAME, c.ID_CARD AS C_ID_CARD, c.PHONE AS C_PHONE,
+            c.EMAIL AS C_EMAIL, c.GENDER AS C_GENDER, c.AGE AS C_AGE,
+            c.ADDRESS AS C_ADDRESS, c.OCCUPATION AS C_OCCUPATION, c.PATIENT_ID AS C_PATIENT_ID,
+            ft.ID AS FT_ID, ft.TYPE_NAME AS FT_TYPE_NAME, ft.TYPE_CODE AS FT_TYPE_CODE,
+            ft.SLA_DAYS AS FT_SLA_DAYS, ft.SLA_HOURS AS FT_SLA_HOURS, ft.DESCRIPTION AS FT_DESCRIPTION,
+            d.ID AS D_ID, d.DEPT_NAME AS D_DEPT_NAME, d.DEPT_CODE AS D_DEPT_CODE,
+            u.ID AS U_ID, u.USERNAME AS U_USERNAME, u.REAL_NAME AS U_REAL_NAME, u.PHONE AS U_PHONE
+        FROM T_FEEDBACK f
+        LEFT JOIN T_COMPLAINANT c ON f.COMPLAINANT_ID = c.ID AND c.DEL_FLAG = 0
+        LEFT JOIN T_FEEDBACK_TYPE ft ON f.FEEDBACK_TYPE_ID = ft.ID AND ft.DEL_FLAG = 0
+        LEFT JOIN SYS_DEPT d ON f.DEPT_ID = d.ID AND d.DEL_FLAG = 0
+        LEFT JOIN SYS_USER u ON f.HANDLER_ID = u.ID AND u.DEL_FLAG = 0
+        WHERE f.DEL_FLAG = 0
+        AND f.SLA_WARNING_TIME &lt;= SYSDATE
+        AND f.STATUS IN ('PENDING', 'ASSIGNED', 'PROCESSING')
+        ORDER BY f.SLA_WARNING_TIME ASC
+    </select>
+
+</mapper>

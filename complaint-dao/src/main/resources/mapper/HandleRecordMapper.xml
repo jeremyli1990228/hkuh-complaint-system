@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkuh.complaint.mapper.HandleRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.hkuh.complaint.entity.HandleRecord">
+        <id column="ID" property="id"/>
+        <result column="FEEDBACK_ID" property="feedbackId"/>
+        <result column="HANDLER_ID" property="handlerId"/>
+        <result column="ACTION" property="action"/>
+        <result column="CONTENT" property="content"/>
+        <result column="ATTACHMENT_IDS" property="attachmentIds"/>
+        <result column="RESULT" property="result"/>
+        <result column="IS_VISIBLE" property="isVisible"/>
+        <result column="CREATE_TIME" property="createTime"/>
+    </resultMap>
+
+    <resultMap id="HandleRecordResultMap" type="com.hkuh.complaint.entity.HandleRecord" extends="BaseResultMap">
+        <association property="handler" javaType="com.hkuh.complaint.entity.User">
+            <id column="U_ID" property="id"/>
+            <result column="U_USERNAME" property="username"/>
+            <result column="U_REAL_NAME" property="realName"/>
+            <result column="U_PHONE" property="phone"/>
+            <result column="U_DEPT_ID" property="deptId"/>
+        </association>
+    </resultMap>
+
+    <select id="selectById" resultMap="HandleRecordResultMap">
+        SELECT
+            hr.ID, hr.FEEDBACK_ID, hr.HANDLER_ID, hr.ACTION, hr.CONTENT,
+            hr.ATTACHMENT_IDS, hr.RESULT, hr.IS_VISIBLE, hr.CREATE_TIME,
+            u.ID AS U_ID, u.USERNAME AS U_USERNAME, u.REAL_NAME AS U_REAL_NAME,
+            u.PHONE AS U_PHONE, u.DEPT_ID AS U_DEPT_ID
+        FROM T_HANDLE_RECORD hr
+        LEFT JOIN SYS_USER u ON hr.HANDLER_ID = u.ID AND u.DEL_FLAG = 0
+        WHERE hr.ID = #{id}
+    </select>
+
+    <select id="selectByFeedbackId" resultMap="HandleRecordResultMap">
+        SELECT
+            hr.ID, hr.FEEDBACK_ID, hr.HANDLER_ID, hr.ACTION, hr.CONTENT,
+            hr.ATTACHMENT_IDS, hr.RESULT, hr.IS_VISIBLE, hr.CREATE_TIME,
+            u.ID AS U_ID, u.USERNAME AS U_USERNAME, u.REAL_NAME AS U_REAL_NAME,
+            u.PHONE AS U_PHONE, u.DEPT_ID AS U_DEPT_ID
+        FROM T_HANDLE_RECORD hr
+        LEFT JOIN SYS_USER u ON hr.HANDLER_ID = u.ID AND u.DEL_FLAG = 0
+        WHERE hr.FEEDBACK_ID = #{feedbackId}
+        ORDER BY hr.CREATE_TIME ASC
+    </select>
+
+    <select id="selectVisibleByFeedbackId" resultMap="HandleRecordResultMap">
+        SELECT
+            hr.ID, hr.FEEDBACK_ID, hr.HANDLER_ID, hr.ACTION, hr.CONTENT,
+            hr.ATTACHMENT_IDS, hr.RESULT, hr.IS_VISIBLE, hr.CREATE_TIME,
+            u.ID AS U_ID, u.USERNAME AS U_USERNAME, u.REAL_NAME AS U_REAL_NAME,
+            u.PHONE AS U_PHONE, u.DEPT_ID AS U_DEPT_ID
+        FROM T_HANDLE_RECORD hr
+        LEFT JOIN SYS_USER u ON hr.HANDLER_ID = u.ID AND u.DEL_FLAG = 0
+        WHERE hr.FEEDBACK_ID = #{feedbackId}
+        AND hr.IS_VISIBLE = 1
+        ORDER BY hr.CREATE_TIME ASC
+    </select>
+
+    <select id="selectByHandlerId" resultMap="BaseResultMap">
+        SELECT ID, FEEDBACK_ID, HANDLER_ID, ACTION, CONTENT,
+               ATTACHMENT_IDS, RESULT, IS_VISIBLE, CREATE_TIME
+        FROM T_HANDLE_RECORD
+        WHERE HANDLER_ID = #{handlerId}
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="selectByAction" resultMap="BaseResultMap">
+        SELECT ID, FEEDBACK_ID, HANDLER_ID, ACTION, CONTENT,
+               ATTACHMENT_IDS, RESULT, IS_VISIBLE, CREATE_TIME
+        FROM T_HANDLE_RECORD
+        WHERE FEEDBACK_ID = #{feedbackId}
+        AND ACTION = #{action}
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="countByFeedbackId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM T_HANDLE_RECORD
+        WHERE FEEDBACK_ID = #{feedbackId}
+    </select>
+
+    <insert id="insert" parameterType="com.hkuh.complaint.entity.HandleRecord">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT SEQ_T_HANDLE_RECORD.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO T_HANDLE_RECORD (
+            ID, FEEDBACK_ID, HANDLER_ID, ACTION, CONTENT,
+            ATTACHMENT_IDS, RESULT, IS_VISIBLE, CREATE_TIME
+        ) VALUES (
+            #{id}, #{feedbackId}, #{handlerId}, #{action}, #{content},
+            #{attachmentIds}, #{result}, NVL(#{isVisible}, 1), SYSDATE
+        )
+    </insert>
+
+    <insert id="insertHandleRecord" parameterType="com.hkuh.complaint.entity.HandleRecord">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT SEQ_T_HANDLE_RECORD.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO T_HANDLE_RECORD (
+            ID, FEEDBACK_ID, HANDLER_ID, ACTION, CONTENT,
+            ATTACHMENT_IDS, RESULT, IS_VISIBLE, CREATE_TIME
+        ) VALUES (
+            #{id}, #{feedbackId}, #{handlerId}, #{action}, #{content},
+            #{attachmentIds}, #{result}, NVL(#{isVisible}, 1), SYSDATE
+        )
+    </insert>
+
+    <update id="update" parameterType="com.hkuh.complaint.entity.HandleRecord">
+        UPDATE T_HANDLE_RECORD
+        <set>
+            <if test="content != null">CONTENT = #{content},</if>
+            <if test="attachmentIds != null">ATTACHMENT_IDS = #{attachmentIds},</if>
+            <if test="result != null">RESULT = #{result},</if>
+            <if test="isVisible != null">IS_VISIBLE = #{isVisible},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <update id="updateHandleRecord" parameterType="com.hkuh.complaint.entity.HandleRecord">
+        UPDATE T_HANDLE_RECORD
+        <set>
+            <if test="content != null">CONTENT = #{content},</if>
+            <if test="attachmentIds != null">ATTACHMENT_IDS = #{attachmentIds},</if>
+            <if test="result != null">RESULT = #{result},</if>
+            <if test="isVisible != null">IS_VISIBLE = #{isVisible},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM T_HANDLE_RECORD WHERE ID = #{id}
+    </delete>
+
+    <delete id="deleteByFeedbackId">
+        DELETE FROM T_HANDLE_RECORD WHERE FEEDBACK_ID = #{feedbackId}
+    </delete>
+
+</mapper>

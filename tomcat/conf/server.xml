@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================
+  港大医院投诉管理系统 - Tomcat Server配置
+  版本: v1.0
+  适用: Tomcat 9.0+
+  ============================================================
+-->
+<Server port="8005" shutdown="SHUTDOWN">
+  
+  <!-- ==================== 监听器 ==================== -->
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+  <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
+
+  <!-- ==================== 全局资源 ==================== -->
+  <GlobalNamingResources>
+    <Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+              pathname="conf/tomcat-users.xml" />
+  </GlobalNamingResources>
+
+  <!-- ==================== 服务配置 ==================== -->
+  <Service name="Catalina">
+
+    <!-- ==================== HTTP/1.1 Connector ==================== -->
+    <Connector 
+        port="8080"
+        protocol="HTTP/1.1"
+        connectionTimeout="30000"
+        redirectPort="8443"
+        maxThreads="200"
+        minSpareThreads="20"
+        acceptCount="100"
+        maxConnections="1000"
+        enableLookups="false"
+        disableUploadTimeout="true"
+        maxHttpFormPostSize="52428800"
+        maxSwallowSize="-1"
+        URIEncoding="UTF-8"
+        useBodyEncodingForURI="true"
+        compression="on"
+        compressionMinSize="1024"
+        noCompressionUserAgents="gozilla, traviata"
+        compressibleMimeType="text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml,application/xml+rss"
+        server="HKUH Complaint System"
+    />
+
+    <!-- ==================== AJP Connector (可选，建议禁用) ==================== -->
+    <!--
+    <Connector 
+        protocol="AJP/1.3"
+        address="0.0.0.0"
+        port="8009"
+        redirectPort="8443"
+        maxThreads="200"
+        minSpareThreads="20"
+        acceptCount="100"
+        connectionTimeout="30000"
+        URIEncoding="UTF-8"
+        secretRequired="false"
+        maxParameterCount="10000"
+    />
+    -->
+
+    <!-- ==================== Engine配置 ==================== -->
+    <Engine name="Catalina" defaultHost="localhost" jvmRoute="complaint">
+
+      <!-- ==================== Realm (可选) ==================== -->
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+
+      <!-- ==================== Host配置 ==================== -->
+      <Host name="localhost"  
+            appBase="webapps"
+            unpackWARs="true"
+            autoDeploy="true"
+            deployOnStartup="true"
+            deployIgnore="\.git|README\.md">
+        
+        <!-- ==================== 访问日志 ==================== -->
+        <Valve className="org.apache.catalina.valves.AccessLogValve"
+               directory="/var/log/complaint"
+               prefix="tomcat_access"
+               suffix=".log"
+               pattern="%h %l %u %t &quot;%r&quot; %s %b %D %{X-Forwarded-For}i %{User-Agent}i"
+               rotatable="true"
+               fileDateFormat="yyyy-MM-dd"
+               maxDays="30"
+               conditionUnless="X-Forwarded-For"
+               resolveHosts="false"/>
+        
+        <!-- ==================== 错误页面 ==================== -->
+        <Valve className="org.apache.catalina.valves.ErrorReportValve"
+               showReport="false"
+               showServerInfo="false"/>
+        
+        <!-- ==================== 远程IP过滤 ==================== -->
+        <Valve className="org.apache.catalina.valves.RemoteIpValve"
+               remoteIpHeader="X-Forwarded-For"
+               protocolHeader="X-Forwarded-Proto"
+               protocolHeaderHttpsValue="https"
+               trustedProxies="127.0.0.1|10\.0\.0\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+|192\.168\.\d+"/>
+
+        <!-- ==================== 默认上下文 ==================== -->
+        <Context path="" 
+                 docBase="complaint-admin" 
+                 reloadable="true"
+                 sessionCookiePath="/"
+                 sessionCookieName="COMPLAINT_SESSION"
+                 sessionCookiePathUsesTrailingSlash="false">
+          
+          <Manager pathname="" />
+          
+          <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
+                          sameSiteCookies="lax" />
+          
+          <!-- 环境变量配置 -->
+          <Environment name="spring.profiles.active" 
+                       value="@spring.profiles.active@" 
+                       type="java.lang.String" 
+                       override="false"/>
+          
+        </Context>
+
+      </Host>
+
+    </Engine>
+
+  </Service>
+
+</Server>

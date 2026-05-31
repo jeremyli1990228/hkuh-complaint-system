@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hkuh.complaint.mapper.AttachmentMapper">
+
+    <resultMap id="BaseResultMap" type="com.hkuh.complaint.entity.Attachment">
+        <id column="ID" property="id"/>
+        <result column="BUSINESS_ID" property="businessId"/>
+        <result column="BUSINESS_TYPE" property="businessType"/>
+        <result column="FILE_NAME" property="fileName"/>
+        <result column="FILE_PATH" property="filePath"/>
+        <result column="FILE_SIZE" property="fileSize"/>
+        <result column="FILE_TYPE" property="fileType"/>
+        <result column="CREATE_BY" property="createBy"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="DEL_FLAG" property="delFlag"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT ID, BUSINESS_ID, BUSINESS_TYPE, FILE_NAME, FILE_PATH,
+               FILE_SIZE, FILE_TYPE, CREATE_BY, CREATE_TIME, DEL_FLAG
+        FROM T_ATTACHMENT
+        WHERE ID = #{id} AND DEL_FLAG = 0
+    </select>
+
+    <select id="selectByBusinessId" resultMap="BaseResultMap">
+        SELECT ID, BUSINESS_ID, BUSINESS_TYPE, FILE_NAME, FILE_PATH,
+               FILE_SIZE, FILE_TYPE, CREATE_BY, CREATE_TIME, DEL_FLAG
+        FROM T_ATTACHMENT
+        WHERE BUSINESS_ID = #{businessId}
+        AND BUSINESS_TYPE = #{businessType}
+        AND DEL_FLAG = 0
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="selectByBusinessIds" resultMap="BaseResultMap">
+        SELECT ID, BUSINESS_ID, BUSINESS_TYPE, FILE_NAME, FILE_PATH,
+               FILE_SIZE, FILE_TYPE, CREATE_BY, CREATE_TIME, DEL_FLAG
+        FROM T_ATTACHMENT
+        WHERE BUSINESS_ID IN
+        <foreach collection="businessIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND BUSINESS_TYPE = #{businessType}
+        AND DEL_FLAG = 0
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="selectByCreateBy" resultMap="BaseResultMap">
+        SELECT ID, BUSINESS_ID, BUSINESS_TYPE, FILE_NAME, FILE_PATH,
+               FILE_SIZE, FILE_TYPE, CREATE_BY, CREATE_TIME, DEL_FLAG
+        FROM T_ATTACHMENT
+        WHERE CREATE_BY = #{createBy}
+        AND DEL_FLAG = 0
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="countByBusinessId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM T_ATTACHMENT
+        WHERE BUSINESS_ID = #{businessId}
+        AND BUSINESS_TYPE = #{businessType}
+        AND DEL_FLAG = 0
+    </select>
+
+    <select id="selectFileTypeStats" resultType="java.util.Map">
+        SELECT FILE_TYPE AS fileType, COUNT(*) AS count, SUM(FILE_SIZE) AS totalSize
+        FROM T_ATTACHMENT
+        WHERE DEL_FLAG = 0
+        <if test="startDate != null">
+            AND CREATE_TIME &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null">
+            AND CREATE_TIME &lt;= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+        </if>
+        GROUP BY FILE_TYPE
+    </select>
+
+    <insert id="insert" parameterType="com.hkuh.complaint.entity.Attachment">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT SEQ_T_ATTACHMENT.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO T_ATTACHMENT (
+            ID, BUSINESS_ID, BUSINESS_TYPE, FILE_NAME, FILE_PATH,
+            FILE_SIZE, FILE_TYPE, CREATE_BY, CREATE_TIME, DEL_FLAG
+        ) VALUES (
+            #{id}, #{businessId}, #{businessType}, #{fileName}, #{filePath},
+            #{fileSize}, #{fileType}, #{createBy}, SYSDATE, NVL(#{delFlag}, 0)
+        )
+    </insert>
+
+    <insert id="insertAttachment" parameterType="com.hkuh.complaint.entity.Attachment">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT SEQ_T_ATTACHMENT.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO T_ATTACHMENT (
+            ID, BUSINESS_ID, BUSINESS_TYPE, FILE_NAME, FILE_PATH,
+            FILE_SIZE, FILE_TYPE, CREATE_BY, CREATE_TIME, DEL_FLAG
+        ) VALUES (
+            #{id}, #{businessId}, #{businessType}, #{fileName}, #{filePath},
+            #{fileSize}, #{fileType}, #{createBy}, SYSDATE, NVL(#{delFlag}, 0)
+        )
+    </insert>
+
+    <update id="updateBusinessId">
+        UPDATE T_ATTACHMENT
+        SET BUSINESS_ID = #{businessId},
+            BUSINESS_TYPE = #{businessType}
+        WHERE ID IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="update" parameterType="com.hkuh.complaint.entity.Attachment">
+        UPDATE T_ATTACHMENT
+        <set>
+            <if test="fileName != null">FILE_NAME = #{fileName},</if>
+            <if test="filePath != null">FILE_PATH = #{filePath},</if>
+            <if test="fileSize != null">FILE_SIZE = #{fileSize},</if>
+            <if test="fileType != null">FILE_TYPE = #{fileType},</if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE T_ATTACHMENT SET DEL_FLAG = 1 WHERE ID = #{id}
+    </update>
+
+    <update id="deleteByBusinessId">
+        UPDATE T_ATTACHMENT
+        SET DEL_FLAG = 1
+        WHERE BUSINESS_ID = #{businessId}
+        AND BUSINESS_TYPE = #{businessType}
+    </update>
+
+</mapper>
