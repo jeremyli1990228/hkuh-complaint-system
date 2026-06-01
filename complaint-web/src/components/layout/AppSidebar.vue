@@ -160,7 +160,7 @@ const handleLogoError = (e: Event) => {
 </script>
 
 <style scoped lang="scss">
-@use '@/assets/styles/variables' as *;
+@import '@/assets/styles/variables.scss';
 
 .app-sidebar {
   width: 240px;

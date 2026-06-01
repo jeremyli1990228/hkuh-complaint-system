@@ -668,7 +668,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-@use '@/assets/styles/variables' as *;
+@import '@/assets/styles/variables.scss';
 
 .satisfaction-dashboard {
   padding: 0;

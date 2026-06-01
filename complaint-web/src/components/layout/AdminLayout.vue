@@ -56,8 +56,8 @@ const cachedViews = computed(() => {
 })
 </script>
 
-<style scoped lang="scss">
-@use '@/assets/styles/variables' as *;
+<style lang="scss">
+@import '@/assets/styles/variables.scss';
 
 .admin-layout {
   height: 100vh;

@@ -35,7 +35,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
 </script>
 
 <style scoped lang="scss">
-@use '@/assets/styles/variables' as *;
+@import '@/assets/styles/variables.scss';
 
 .app-breadcrumb {
   display: flex;
