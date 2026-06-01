@@ -3,7 +3,7 @@
     <div class="login-left">
       <div class="brand-content">
         <div class="logo-wrapper">
-          <img src="@/assets/images/logo.png" alt="HKUH Logo" class="logo" @error="handleLogoError" />
+          <div class="logo-placeholder">HKU</div>
         </div>
         <h1 class="system-title">港大医院投诉管理系统</h1>
         <p class="system-subtitle">HKU Hospital Complaint Management System</p>
@@ -228,11 +228,6 @@ const handleLogin = async () => {
   })
 }
 
-const handleLogoError = (e: Event) => {
-  const target = e.target as HTMLImageElement
-  target.style.display = 'none'
-}
-
 onMounted(() => {
   fetchCaptcha()
 })
@@ -300,13 +295,18 @@ onMounted(() => {
 .logo-wrapper {
   margin-bottom: 40px;
 
-  .logo {
+  .logo-placeholder {
     width: 120px;
     height: 120px;
     border-radius: 50%;
+    background: linear-gradient(135deg, $primary-color, #1a73e8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 36px;
+    font-weight: bold;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    background: white;
-    padding: 10px;
   }
 }
 

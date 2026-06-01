@@ -5,7 +5,7 @@
         <Fold v-if="!sidebarOpened" />
         <Expand v-else />
       </el-icon>
-      <img src="@/assets/images/logo.png" alt="Logo" class="header-logo" @error="handleLogoError" />
+      <div class="header-logo">HKU</div>
       <span class="header-title">港大医院投诉管理系统</span>
     </div>
 
@@ -189,11 +189,6 @@ const handleChangePassword = async () => {
     }
   })
 }
-
-const handleLogoError = (e: Event) => {
-  const target = e.target as HTMLImageElement
-  target.style.display = 'none'
-}
 </script>
 
 <style scoped lang="scss">
@@ -229,7 +224,13 @@ const handleLogoError = (e: Event) => {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    object-fit: cover;
+    background: linear-gradient(135deg, $primary-color, #1a73e8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
   }
 
   .header-title {

@@ -1,7 +1,7 @@
 <template>
   <div class="app-sidebar" :class="{ 'is-collapse': isCollapse }">
     <div class="sidebar-logo" :class="{ 'logo-collapse': isCollapse }">
-      <img v-if="!isCollapse" src="@/assets/images/logo.png" alt="Logo" class="logo-img" @error="handleLogoError" />
+      <div v-if="!isCollapse" class="logo-img">HKU</div>
       <span v-if="!isCollapse" class="logo-text">投诉管理</span>
       <span v-else class="logo-collapse-text">投</span>
     </div>
@@ -152,11 +152,6 @@ const resolvePath = (parentPath: string, childPath: string): string => {
   }
   return `/${parentPath}/${childPath}`.replace(/\/+/g, '/')
 }
-
-const handleLogoError = (e: Event) => {
-  const target = e.target as HTMLImageElement
-  target.style.display = 'none'
-}
 </script>
 
 <style scoped lang="scss">
@@ -194,7 +189,13 @@ const handleLogoError = (e: Event) => {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    object-fit: cover;
+    background: linear-gradient(135deg, $primary-color, #1a73e8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
     flex-shrink: 0;
   }
 
